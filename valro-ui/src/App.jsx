@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 
 // Get API base URL from environment variable or use deployed API Gateway
@@ -11,28 +11,41 @@ function App() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const intervalRef = useRef(null);
 
   // Fetch all tasks on mount
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // Poll selected task every 3 seconds
+  // Poll selected task every 3 seconds while task is active
   useEffect(() => {
-    let interval;
     if (selectedTaskId) {
       // Fetch immediately
       fetchTask(selectedTaskId);
 
-      // Then poll every 3 seconds
-      interval = setInterval(() => {
+      // Start polling
+      intervalRef.current = setInterval(() => {
         fetchTask(selectedTaskId);
       }, 3000);
     }
     return () => {
-      if (interval) clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
   }, [selectedTaskId]);
+
+  // Stop polling when task reaches terminal state
+  useEffect(() => {
+    if (selectedTask?.status === "completed" || selectedTask?.status === "error") {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  }, [selectedTask?.status]);
 
   const fetchTasks = async () => {
     try {
@@ -53,6 +66,12 @@ function App() {
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       const data = await res.json();
       setSelectedTask(data);
+
+      // Update the task in the tasks array so sidebar shows latest state
+      setTasks(prevTasks =>
+        prevTasks.map(t => t.id === taskId ? data : t)
+      );
+
       setError(null);
     } catch (err) {
       console.error("Error fetching task:", err);
@@ -244,6 +263,20 @@ function App() {
                       <div className="vendor-detail">
                         {v.service} • {v.city}
                       </div>
+                      {v.emails && v.emails.length > 0 && (
+                        <div className="vendor-emails">
+                          <div className="email-badge">
+                            Email sent {new Date(v.emails[0].timestamp).toLocaleString()}
+                          </div>
+                          <details className="email-details">
+                            <summary>View email</summary>
+                            <div className="email-content">
+                              <div><strong>Subject:</strong> {v.emails[0].subject}</div>
+                              <div className="email-body">{v.emails[0].body}</div>
+                            </div>
+                          </details>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

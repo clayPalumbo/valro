@@ -2,26 +2,25 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "DynamoDBTaskAccess",
+      "Sid": "BedrockAgentCoreAccess",
       "Effect": "Allow",
       "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:GetItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:Scan"
+        "bedrock-agentcore:InvokeAgentRuntime",
+        "bedrock-agentcore:GetAgentRuntime"
       ],
       "Resource": [
-        "arn:aws:dynamodb:*:*:table/valro-tasks"
+        "arn:aws:bedrock-agentcore:*:*:runtime/*"
       ]
     },
     {
-      "Sid": "LambdaInvokeWorker",
+      "Sid": "DynamoDBTaskAccess",
       "Effect": "Allow",
       "Action": [
-        "lambda:InvokeFunction"
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem"
       ],
       "Resource": [
-        "arn:aws:lambda:*:*:function:valro-worker"
+        "arn:aws:dynamodb:*:*:table/valro-tasks"
       ]
     },
     {

@@ -20,6 +20,12 @@ MODEL_ID = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 ci_sessions = {}
 current_session = None
 
+# Track tool executions for response
+tool_executions = {
+    'vendors': [],
+    'emails': []
+}
+
 # Mock vendor database for POC
 VENDOR_DATABASE = {
     "landscaping": {
@@ -82,6 +88,9 @@ def getVendors(service: str, city: str, budget: float = None) -> str:
         # Default fallback - return Charlotte landscaping vendors
         vendors = VENDOR_DATABASE["landscaping"]["charlotte"]
 
+    # Track vendors for response
+    tool_executions['vendors'] = vendors
+
     result = {
         "vendors": vendors,
         "matched_service": service,
@@ -115,6 +124,15 @@ def sendEmail(to: str, subject: str, body: str, taskId: str = None) -> str:
     print(f"Body: {body}")
     print(f"Task ID: {taskId}")
     print("-" * 80)
+
+    # Track email for response
+    email_record = {
+        "recipient": to,
+        "subject": subject,
+        "body": body,
+        "timestamp": timestamp
+    }
+    tool_executions['emails'].append(email_record)
 
     return json.dumps({
         "status": "sent",
@@ -153,7 +171,13 @@ def calculate(code: str) -> str:
 
 @app.entrypoint
 def invoke(payload, context):
-    global current_session
+    global current_session, tool_executions
+
+    # Reset tool execution tracking for this invocation
+    tool_executions = {
+        'vendors': [],
+        'emails': []
+    }
 
     if not MEMORY_ID:
         return {"error": "Memory not configured"}
@@ -196,7 +220,17 @@ Assume this is a long-running task: the user SHOULD NOT have to call, text, or e
     )
 
     result = agent(payload.get("prompt", ""))
-    return {"response": result.message.get('content', [{}])[0].get('text', str(result))}
+
+    # Extract text response
+    text_response = result.message.get('content', [{}])[0].get('text', str(result))
+
+    # Return tracked tool execution data
+    return {
+        "response": text_response,
+        "vendors": tool_executions.get('vendors', []),
+        "emails": tool_executions.get('emails', []),
+        "emails_sent": len(tool_executions.get('emails', []))
+    }
 
 if __name__ == "__main__":
     app.run()

@@ -320,6 +320,60 @@
   margin-bottom: 0.25rem;
 }
 
+.vendor-emails {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.email-badge {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.email-details {
+  margin-top: 0.5rem;
+}
+
+.email-details summary {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.25rem 0;
+}
+
+.email-details summary:hover {
+  text-decoration: underline;
+}
+
+.email-content {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.email-content > div {
+  margin-bottom: 0.5rem;
+}
+
+.email-content > div:last-child {
+  margin-bottom: 0;
+}
+
+.email-body {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  color: #374151;
+  white-space: pre-wrap;
+}
+
 .quotes-list {
   display: flex;
   flex-direction: column;

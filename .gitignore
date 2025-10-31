@@ -81,10 +81,14 @@ build/
 *.zip
 valro-lambda.zip
 package/
+package-api/
+package-worker/
 *.pyc
 
 # boto3/botocore vendored packages and wheels included in repo
 package/**
+package-api/** 
+package-worker/**
 
 # Logs
 *.log
