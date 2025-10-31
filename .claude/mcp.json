@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "aws-docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@aws/mcp-server-aws-docs"
+      ],
+      "env": {}
+    },
+    "aws-kb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-aws-kb"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  }
+}
